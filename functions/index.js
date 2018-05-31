@@ -6,36 +6,24 @@ const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 admin.initializeApp(functions.config().firebase);
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-
 
 exports.guardar = functions.https.onRequest((req, res) => {
-
 	cors(req, res, () => {});
 
-	if (req.method === `OPTIONS`) {
-		res.set('Access-Control-Allow-Origin', '*')
-		   .set('Access-Control-Allow-Methods', 'POST')
-		   .status(200);
-		   return;
-	}
-
-	if(req.method !== "POST"){
-	 res.status(400).send('Please send a POST request');
-	 return;
-	}
-
-	const list = req.body;
+	const data = req.body;
+		//console.log(data);
 
 	const store = admin.firestore();
-	for (var i = 0; i < list.length; i++) {
-		var item=list[i];
-		store.collection('primeraVuelta').add(item);
+	for (var i = 0; i < data.lista.length; i++) {
+		var item=data.lista[i];
+		//console.log(item);
+
+		store.collection('primeraVuelta').add(item).then(function() {
+		    console.log("Document successfully written!");
+		}).catch(function(error) {
+		    console.error("Error writing document: ", error);
+		});
+
 		//store.doc('primeraVuelta').add(item);
 	}
 
