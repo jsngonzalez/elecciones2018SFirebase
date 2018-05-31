@@ -16,6 +16,15 @@ admin.initializeApp(functions.config().firebase);
 
 exports.guardar = functions.https.onRequest((req, res) => {
 
+	cors(req, res, () => {});
+
+	if (req.method === `OPTIONS`) {
+		res.set('Access-Control-Allow-Origin', '*')
+		   .set('Access-Control-Allow-Methods', 'POST')
+		   .status(200);
+		   return;
+	}
+
 	if(req.method !== "POST"){
 	 res.status(400).send('Please send a POST request');
 	 return;
