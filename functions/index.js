@@ -32,3 +32,21 @@ exports.guardar = functions.https.onRequest((req, res) => {
 
 });
 
+exports.obtener = functions.https.onRequest((req, res) => {
+	cors(req, res, () => {});
+
+
+	const store = admin.firestore();
+	var doc = store.collection('primeraVuelta').where('calificacion', '=', '0').limit(1);
+
+	if (!doc.exists) {
+		res.status(200).send({error:1,response:"No se encontraron resultados."});
+	} else {
+		res.status(200).send({error:0,response:doc.data()});
+	}
+
+
+
+});
+
+
