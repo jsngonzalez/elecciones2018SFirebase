@@ -37,16 +37,42 @@ exports.obtener = functions.https.onRequest((req, res) => {
 
 
 	const store = admin.firestore();
-	var doc = store.collection('primeraVuelta').where('calificacion', '=', '0').limit(1);
+	store.collection('primeraVuelta').where('calificacion', '==', '0').limit(1).get().then(function(querySnapshot) {
 
-	if (!doc.exists) {
-		res.status(200).send({error:1,response:"No se encontraron resultados."});
-	} else {
-		res.status(200).send({error:0,response:doc.data()});
-	}
+		querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+            if (doc.exists) {
+            	var data=doc.data();
+            	data.id=doc.id;
+				res.status(200).send({error:0,response:data});
+		    } else {
+		        // doc.data() will be undefined in this case
+				res.status(200).send({error:1,response:"No se encontraron resultados."});
+		    }
+
+        });
+	}).catch(function(error) {
+		res.status(200).send({error:1,response:error});
+	});
 
 
 
 });
 
+
+exports.calificar = functions.https.onRequest((req, res) => {
+	cors(req, res, () => {});
+
+	const data = req.body;
+	const store = admin.firestore();
+	store.collection('primeraVuelta').doc(data.id).update({
+	    calificacion: data.calificacion
+	}).then(function() {
+		res.status(200).send({error:0,response:"Formulario actualizado. gracias!"});
+	}).catch(function(error) {
+		res.status(200).send({error:1,response:error});
+	});
+
+});
 
